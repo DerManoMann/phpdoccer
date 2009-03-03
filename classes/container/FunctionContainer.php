@@ -14,6 +14,16 @@ class FunctionContainer extends PDContainer {
 
 
     /**
+     * Get the return type.
+     *
+     * @return string The return type.
+     */
+    public function getReturnType() {
+        $type = $this->get('fieldType');
+        return null != $type ? $type : 'void';
+    }
+
+    /**
      * Get the parameters.
      *
      * @return array List of <code>ParameterContainer</code> instances.

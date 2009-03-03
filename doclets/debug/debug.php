@@ -142,36 +142,16 @@ class Debug extends PDDoclet {
     protected function methodDoc($methodList) {
         $this->depth_++;
         foreach ($methodList as $container) {
-            $name = $container->getName();
-            echo $this->showDepth(), $container->getVisibility(), ' ', $container->getName(), ' ';
+            echo $this->showDepth(), $container->getVisibility(), ' ';
+            if ($container->isFinal()) {
+                echo 'final', ' ';
+            }
+            echo $container->getReturnType(), ' ';
+            echo $container->getName(), ' ';
             echo $this->buildFunctionSignature($container);
+            // TODO: exceptions
             echo $this->buildFileInfo($container);
             echo "\n";
-            //$this->fieldDoc($container->get('parameter'));
-
-            /*
-            $type = $method->returnType();
-            echo $this->showDepth(), $method->modifiers();
-            if ($type) {
-            echo $type->toString(), ' ';
-            } else {
-            echo 'void ';
-            }
-            echo $method->name(), $method->flatSignature(), "\n";
-            $this->fieldDoc($method->parameters());
-            $this->methodDoc($method->functions());
-            $exceptions =& $method->thrownExceptions();
-            if ($exceptions) {
-            foreach ($exceptions as $exception) {
-            echo str_repeat('|', $this->depth_ + 1), '- throws ';
-            if (is_object($exception)) {
-            echo $exception->name(), "\n";
-            } else {
-            echo $exception, "\n";
-            }
-            }
-            }
-             */
         }
         $this->depth_--;
     }
