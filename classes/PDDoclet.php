@@ -29,6 +29,15 @@ abstract class PDDoclet {
     }
 
     /**
+     * Get the mediator.
+     *
+     * @return PDMediator The mediator.
+     */
+    public function getMediator() {
+        return $this->mediator_;
+    }
+
+    /**
      * Build a simple file info string.
      *
      * @param PDContainer container A container.
@@ -60,22 +69,15 @@ abstract class PDDoclet {
         return '(' . $s . ')';
     }
 
-/*
-		$signature = '';
-		$myPackage =& $this->containingPackage();
-		foreach($this->_parameters as $param) {
-			$type =& $param->type();
-			$classDoc =& $type->asClassDoc();
-			if ($classDoc) {
-				$packageDoc =& $classDoc->containingPackage();
-				$signature .= '<a href="'.str_repeat('../', $myPackage->depth() + 1).$classDoc->asPath().'">'.$classDoc->name().'</a> '.$param->name().', ';
-			} else {
-				$signature .= $type->typeName().' '.$param->name().', ';
-			}
-		}
-		return '('.substr($signature, 0, -2).')';
- */
-
+    /**
+     * Handle link generation.
+     *
+     * @param PDTag tag The tag containing the link.
+     * @param string link The link/url.
+     * @param string text Optional link text; default is <code>null</code>.
+     * @return string The link text.
+     */
+    public abstract function buildLink(PDTag $tag, $link, $text=null);
 
     /**
      * Generate the documentation.

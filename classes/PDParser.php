@@ -60,11 +60,16 @@ class PDParser {
 
         $data = array(
             'docComment' => $comment,
-            'tags' => array(),
-            'visibility' => 'public',
-            'abstract' => false,
-            'final' => false,
-            'static' => false
+            'tags' => array()
+            /*
+                '@package' => null,
+                '@fieldType' => null,
+                '@visibility' => null,
+                '@abstract' => false,
+                '@final' => false,
+                '@static' => false
+            )
+         */
         );
         
         // split into token
@@ -74,7 +79,7 @@ class PDParser {
 
         if (isset($matches[1])) {
             // plain text
-            $data['tags']['@text'] = array($this->tagFactory_->createTag('@text', trim(join("\n", $matches[1])), $data, $this->tagFactory_));
+            $data['tags']['@text'] = array($this->tagFactory_->createTag('@text', trim(join("\n", $matches[1])), $data, $this->mediator_));
         }
         
         // process tags
@@ -94,27 +99,27 @@ class PDParser {
             switch ($name) {
             case 'package':
                 // place current element in package
-                $data['package'] = $text;
+                $data['tags']['@package'] = $text;
                 break;
             case 'var':
                 // set variable type
-                $data['fieldType'] = $text;
+                $data['tags']['@fieldType'] = $text;
                 break;
             case 'access':
                 // set access permission
-                $data['visibility'] = $text;
+                $data['tags']['@visibility'] = $text;
                 break;
             case 'final':
                 // element is final
-                $data['final'] = true;
+                $data['tags']['@final'] = true;
                 break;
             case 'abstract':
                 // element is abstract
-                $data['abstract'] = true;
+                $data['tags']['@abstract'] = true;
                 break;
             case 'static': 
                 // element is static
-                $data['static'] = true;
+                $data['tags']['@static'] = true;
                 break;
             default: 
                 // other tag
@@ -122,7 +127,7 @@ class PDParser {
                 if (!array_key_exists($tagName, $data['tags'])) {
                     $data['tags'][$tagName] = array();
                 }
-                $data['tags'][$tagName][] = $this->tagFactory_->createTag($tagName, $text, $data, $this->tagFactory_);
+                $data['tags'][$tagName][] = $this->tagFactory_->createTag($tagName, $text, $data, $this->mediator_);
             }
         }
 
@@ -143,7 +148,13 @@ class PDParser {
         $container = new $class($this->currentDocComment_, $this->currentCodeInfo_);
         $container->set('name', $name);
         $this->currentDocComment_ = array();
-        $this->currentCodeInfo_ = array();
+        // same defaults as docData
+        $this->currentCodeInfo_ = array(
+            '@visibility' => null,
+            '@abstract' => false,
+            '@final' => false,
+            '@static' => false
+        );
 
         $container->set('filename', $this->tokenizer_->getFilename());
         $container->set('lineNumber', $this->lineNumber_);

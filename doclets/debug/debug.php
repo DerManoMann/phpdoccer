@@ -17,7 +17,7 @@ class Debug extends PDDoclet {
 
 
     /**
-     * Generate the documentation.
+     * {@inheritDoc}
      */
     public function generate() {
         ob_start();
@@ -25,6 +25,7 @@ class Debug extends PDDoclet {
         // iterate over all container
         //foreach ($this->mediator_->getDocContainerByPackage('class') as $package => $containerList) {
         foreach ($this->mediator_->getPackageMap() as $package => $typeList) {
+            $package = PDMediator::DEFAULT_PACKAGE == $package ? $this->mediator_->getConfigValue('default_package') : $package;
             echo $this->showDepth(), $package, "\n";
             foreach ($typeList as $type => $containerList) {
                 if ('class' == $type) {
@@ -42,6 +43,19 @@ class Debug extends PDDoclet {
             $output = nl2br($output);
         }
         echo $output;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildLink(PDTag $tag, $link, $text=null) {
+        if (empty($text)) {
+            $text = $link;
+        }
+
+        $container = $this->mediator_->findContainerForLink($link);
+
+        return $link.'/'.$text;
     }
 
 
@@ -78,6 +92,23 @@ class Debug extends PDDoclet {
                 }
             }
             echo $this->buildFileInfo($container), "\n";
+
+            $docData = $container->getDocData();
+            if (array_key_exists('tags', $docData)) {
+                foreach ($docData['tags'] as $name => $tagData) {
+                    if (is_array($tagData)) {
+                        echo $name . ':' . "\n";
+                        foreach ($tagData as $tag) {
+                            foreach ($tag->getInlineTags() as $tag) {
+                                echo '::'.$tag->getName().':'.$tag->toString($this), "\n";
+                            }
+                        }
+                    } else {
+                        echo $name . ' = ' . $tagData."\n";
+                    }
+                }
+            }
+
             $this->fieldDoc($container->getConsts(), false);
             $this->fieldDoc($container->getFields(), true);
             if ('class' == $container->getType()) {
@@ -149,7 +180,7 @@ class Debug extends PDDoclet {
             echo $container->getReturnType(), ' ';
             echo $container->getName(), ' ';
             echo $this->buildFunctionSignature($container);
-            // TODO: exceptions
+            //TODO: exceptions
             echo $this->buildFileInfo($container);
             echo "\n";
         }

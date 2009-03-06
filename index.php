@@ -79,6 +79,7 @@ class HTMLLogger implements PDLogger {
 
 $main = new main();
 $main->setLogger(new HTMLLogger());
-$main->run(array(dirname(__FILE__).'/phpdoccer.ini', dirname(__FILE__).'/debug.ini'));
+$doclet = $main->run(array(dirname(__FILE__).'/phpdoccer.ini', dirname(__FILE__).'/debug.ini'));
+//$doclet = $main->run(array(dirname(__FILE__).'/test-php5.ini', dirname(__FILE__).'/phpdoccer.ini', dirname(__FILE__).'/debug.ini'));
 
 ?>

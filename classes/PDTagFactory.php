@@ -13,10 +13,10 @@ interface PDTagFactory {
 	 * @param string name The name of the tag>
 	 * @param string text The tag text.
 	 * @param array docData The docData referencing this tag.
-	 * @param PDTagFactory tagFactory A tag factory to be used by the new tag.
+	 * @param PDMediator mediator The mediator.
 	 * @return PDTag A tag or <code>null</code>.
 	 */
-	public function createTag($name, $text, $docData, $tagFactory);
+	public function createTag($name, $text, $docData, PDMediator $mediator);
 	
 }
 

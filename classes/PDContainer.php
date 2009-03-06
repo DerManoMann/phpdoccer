@@ -129,7 +129,7 @@ class PDContainer {
      * @return string Either of 'public', 'protected', 'private'.
      */
     public function getVisibility() {
-        return $this->getMerged('visibility');
+        return $this->getMerged('@visibility');
     }
 
     /**
@@ -138,23 +138,28 @@ class PDContainer {
      * @return boolean <code>true</code> if final.
      */
     public function isFinal() {
-        return $this->getMerged('final');
+        return $this->getMerged('@final');
     }
 
     /**
      * Get data from merged doc and parse info.
      *
      * @param string name The name.
+     * @param boolean preferDocData Optional flag to indicate whether to return docData
+     * or parseInfo in case they differ; default is <code>true</code>.
      * @return string The value or <code>null</code>.
      */
-    protected function getMerged($name) {
+    protected function getMerged($name, $preferDocData=true) {
         $value = null;
-        if (array_key_exists($name, $this->docData_)) {
-            $value = $this->docData_[$name];
+        if (array_key_exists('tags', $this->docData_) && array_key_exists($name, $this->docData_['tags'])) {
+            $value = $this->docData_['tags'][$name];
         }
         if (array_key_exists($name, $this->codeInfo_)) {
             if ($value != $this->codeInfo_[$name]) {
                 $this->log('warning', 'doc mismatch on ' . $name);
+                if (!$preferDocData) {
+                    $value = $this->codeInfo_[$name];
+                }
             }
         }
         return $value;

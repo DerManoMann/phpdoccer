@@ -89,29 +89,29 @@ class main implements PDLogger, PDTagFactory {
     /**
      * {@inheritDoc}
      */
-    public function createTag($name, $text, $docData, $tagFactory) {
+    public function createTag($name, $text, $docData, PDMediator $mediator) {
         $class = ucwords(substr($name, 1));
         if (!class_exists($class)) {
             $tagletFile = $this->fixPath($this->config_['taglet_path']).substr($name, 1).'.php';
             if (is_file($tagletFile)) {
                 // load taglet for this tag
                 require_once $tagletFile;
-                return new $class($name, $text, $docData, $tagFactory);
+                return new $class($name, $text, $docData, $mediator);
             } else {
                 $tagFile = 'classes/tags/'.$class.'Tag.php';
                 if (is_file($tagFile)) {
                     // load class for this tag
                     $class .= 'Tag';
                     require_once $tagFile;
-                    return new $class($name, $text, $docData, $tagFactory);
+                    return new $class($name, $text, $docData, $mediator);
                 } else {
                     // create standard tag
-                    return new PDTag($name, $text, $docData, $tagFactory);
+                    return new PDTag($name, $text, $docData, $mediator);
                 }
             }
         }
 
-        return new $class($name, $text, $docData, $tagFactory);
+        return new $class($name, $text, $docData, $mediator);
     }
 
     /**
@@ -299,6 +299,7 @@ class main implements PDLogger, PDTagFactory {
      * Run.
      *
      * @param array configList Configuration filename list.
+     * @return PDDoclet The doclet for this run.
      */
     public function run($configList) {
         if (0 == count($configList)) {
@@ -344,7 +345,8 @@ class main implements PDLogger, PDTagFactory {
         $doclet->setMediator($mediator);
         $doclet->generate();
 
-		$this->message('Done ('.round($this->getTime() - $start_time, 2).' seconds)');
+		    $this->message('Done ('.round($this->getTime() - $start_time, 2).' seconds)');
+        return $doclet;
     }
 
 }

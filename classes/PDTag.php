@@ -20,7 +20,7 @@ class PDTag {
      * @param array docData The context doc data.
      * @param PDMediator mediator A mediator.
      */
-    public function __construct($name, $text, $docData, $mediator) {
+    public function __construct($name, $text, $docData, PDMediator $mediator) {
         $this->name_ = $name;
         $processedText = '';
         foreach(explode("\n", $text) as $line) {
@@ -50,6 +50,16 @@ class PDTag {
     }
 
     /**
+     * The string representation of this tag.
+     *
+     * @param PDDoclet doclet The doclet.
+     * @return string The tag string.
+     */
+    public function toString(PDDoclet $doclet) {
+        return $this->getText();
+    }
+
+    /**
      * For documentation comment with embedded @link tags, return the array of
      * tags. 
      *
@@ -65,7 +75,7 @@ class PDTag {
      * @return array List of <code>PDTag</code> instances.
      */
     public function getInlineTags() {
-        return $this->parseInlineTags($this->text());
+        return $this->mediator_->parseInlineTags($this->text_, $this->docData_);
     }
 
     /**
@@ -87,39 +97,6 @@ class PDTag {
         } else {
             return array($this);
         }
-    }
-
-    /**
-     * Parse out inline tags from within a text string.
-     *
-     * @param string text The text to parse.
-     * @return array List of tags.
-     */
-    protected function parseInlineTags($text) {
-        $tagStrings = preg_split('/{(@.+)}/sU', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-        if ($tagStrings) {
-            $inlineTags = null;
-            foreach ($tagStrings as $tag) {
-                if (substr($tag, 0, 1) == '@') {
-                    $pos = strpos($tag, ' ');
-                    if ($pos !== false) {
-                        $name = trim(substr($tag, 0, $pos));
-                        $text = trim(substr($tag, $pos + 1));
-                    } else {
-                        $name = $tag;
-                        $text = null;
-                    }
-                } else {
-                    $name = '@text';
-                    $text = $tag;
-                }
-                $data = null;
-                $inlineTag = $this->mediator_->getTagFactory()->createTag($name, $text, $this->docData_, $this->mediator_);
-                $inlineTags[] = $inlineTag;
-            }
-            $return = $inlineTags;
-        }
-        return $return;
     }
 
 }
